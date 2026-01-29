@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.25)
 project(BookDB VERSION 1.0.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_C_COMPILER /opt/gcc-15/bin/gcc)
+set(CMAKE_CXX_COMPILER /opt/gcc-15/bin/g++)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -13,7 +15,6 @@ endif()
 
 # Ищем необходимые библиотеки
 find_package(GTest REQUIRED)
-find_package(fmt REQUIRED)
 
 file(GLOB HEADER_FILES "${CMAKE_SOURCE_DIR}/include/*.hpp")
 
@@ -26,7 +27,7 @@ target_include_directories(${PROJECT_NAME}_imp PUBLIC
 
 # Создаём исполняемый таргет и линкуем к нему статическую библиотеку
 add_executable(${PROJECT_NAME} "${CMAKE_SOURCE_DIR}/src/main.cpp")
-target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_imp fmt::fmt)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_imp)
 
 #
 # Тесты
@@ -36,7 +37,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_imp fmt::fmt)
 file(GLOB TEST_SRC_FILES "${CMAKE_SOURCE_DIR}/tests/*.cpp")
 
 add_executable(unit_tests "${TEST_SRC_FILES}")
-target_link_libraries(unit_tests PRIVATE ${PROJECT_NAME}_imp GTest::GTest GTest::Main fmt::fmt)
+target_link_libraries(unit_tests PRIVATE ${PROJECT_NAME}_imp GTest::GTest GTest::Main)
 target_include_directories(unit_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Включаем тестирование
