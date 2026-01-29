@@ -32,7 +32,7 @@ struct Book {
     double rating;
     int read_count;
 
-    constexpr Book(std::string_view ttl, std::string_view auth, int yr, Genre g, double rt, int rc)
+    constexpr Book(std::string_view ttl, std::string_view auth, int yr, Genre g, double rt, int rc) noexcept
         : title{ttl}, author{auth}, year(yr), genre(g), rating(rt), read_count(rc) {}
 
     constexpr Book(std::string_view ttl, std::string_view auth, int yr, std::string_view genre_str, double rt, int rc)
@@ -43,7 +43,7 @@ struct Book {
     constexpr Book(std::string_view ttl, std::string auth_str, int yr, Genre g, double rt, int rc) noexcept
         : title{ttl}, author{std::move(auth_str)}, year(yr), genre(g), rating(rt), read_count(rc) {}
 
-    Book(const char *ttl, const char *auth, int yr, Genre g, double rt, int rc) noexcept
+    constexpr Book(const char *ttl, const char *auth, int yr, Genre g, double rt, int rc) noexcept
         : title{ttl}, author{auth}, year(yr), genre(g), rating(rt), read_count(rc) {}
 
     auto operator<=>(const Book &) const = default;

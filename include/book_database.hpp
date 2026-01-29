@@ -26,19 +26,19 @@ public:
 
     BookDatabase(std::initializer_list<Book> books) : books_{books} {
         for (const auto &book : books) {
-            authors_.emplace(book.author);
+            auto [ath, tmp] = authors_.emplace(book.author);
+            books_.push_back(Book{book.title, std::string_view(ath->data(), ath->size()), book.year, book.genre, book.rating, book.read_count});
         }
     }
 
-    void PushBack(Book book) {
-        authors_.emplace(book.author);
-        books_.push_back(std::move(book));
+    void PushBack(const Book& book) {
+         auto [ath, tmp] = authors_.emplace(book.author);
+        books_.push_back(Book(book.title, std::string_view(ath->data(), ath->size()), book.year, book.genre, book.rating, book.read_count));
     }
 
     template <typename... Args>
     void EmplaceBack(Args &&...args) {
-        auto &book = books_.emplace_back(std::forward<Args>(args)...);
-        authors_.emplace(book.author);
+        PushBack(Book(std::forward<Args>(args)...));
     }
 
     void Clear() {
