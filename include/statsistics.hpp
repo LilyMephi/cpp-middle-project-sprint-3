@@ -21,10 +21,12 @@ auto buildAuthorHistogramFlat(const BookDatabase<T> &books, BookComparator comp 
 
     std::flat_map<std::string_view, size_type, BookComparator> histogram;
 
-    for (const auto &author : books.GetAuthors()) {
-        size_type count = std::count_if(books.GetBooks().begin(), books.GetBooks().end(),
-                                        [author](const Book &b) { return b.author == author; });
-        histogram[author] = count;
+    for (const auto &book : books.GetBooks()) {
+        if (auto [it, inserted] = histogram.try_emplace(book.author, 0); inserted) {
+            it->second = 1;
+        } else {
+            ++it->second;
+        }
     }
 
     return histogram;
@@ -34,19 +36,18 @@ template <BookIterator Iterator>
 auto calculateGenreRatings(const Iterator first, const Iterator last) {
     std::flat_map<Genre, double> res;
 
-    for (auto book = first; book != last; ++book) {
-        if (!res.contains(book->genre)) {
-            Genre genre = book->genre;
+    static constexpr Genre all_genres[] = {Genre::Fiction,   Genre::NonFiction, Genre::SciFi,
+                                           Genre::Biography, Genre::Mystery,    Genre::Unknown};
 
-            auto count = std::count_if(first, last, [genre](const Book &b) { return b.genre == genre; });
-
-            auto sum = std::transform_reduce(std::execution::par, first, last, 0.0, std::plus<>{},
-                                             [genre](const Book &b) { return (b.genre == genre ? b.rating : 0.0); });
-            if (count > 0) {
-                res[genre] = sum / static_cast<double>(count);
-            }
+    for (auto genre : all_genres) {
+        auto count = std::count_if(first, last, [genre](const Book &b) { return b.genre == genre; });
+        auto sum = std::transform_reduce(std::execution::par, first, last, 0.0, std::plus<>{},
+                                         [genre](const Book &b) { return (b.genre == genre ? b.rating : 0.0); });
+        if (count > 0) {
+            res[genre] = sum / static_cast<double>(count);
         }
     }
+
     return res;
 }
 

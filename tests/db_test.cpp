@@ -119,9 +119,9 @@ TEST_F(BookDatabaseTesting, AuthorHistogram) {
     auto histogram = buildAuthorHistogramFlat(db);
 
     EXPECT_EQ(9, histogram.size());
-    auto it = std::find_if(
-        histogram.begin(), histogram.end(),
-        [](const auto &pair) { return pair.first == "George Orwell"; });
+    std::string_view ath = "George Orwell";
+    auto it = histogram.find(ath);
+
     ASSERT_NE(histogram.end(), it);
     EXPECT_EQ(2, it->second);
 }
